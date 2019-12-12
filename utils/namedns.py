@@ -2,21 +2,31 @@ import requests
 
 class Session():
 
-    BASE_URL = 'api.name.com'
-    BASE_DEV_URL = 'api.dev.name.com' 
     API_VERSION = '4'
+    BASE_URL = 'https://api.name.com'
+    BASE_DEV_URL = 'https://api.dev.name.com'
 
     def __init__(self, username, api_token, dev=False):
         self.username = username if not dev else f"{username}-test"
         self.api_token = api_token
-        self.base_url = self.BASE_URL if not dev else self.BASE_DEV_URL 
+        
+        base_url = self.BASE_URL if not dev else self.BASE_DEV_URL
+        self.base_url = f"{base_url}/v{self.API_VERSION}"
 
-    def list(self, domain):
+    def list_domains(self):
+        """List all domains for the given account.
+        """
+        url = f"{self.base_url}/domains"
+        r = requests.get(url)
+
+    def list_records(self, domain):
         """List all DNS records for the given domain.
         """
-        r = requests.get(f"https://{self.base_url}/domains/{domain}/records")
+        url = f"https://{self.base_url}/v{self.API_VERSION}/domains/{domain}/records"
+        r = requests.get(url, auth=(self.username, self.api_token))
 
         if not r.ok:
+            print(r.content)
             r.raise_for_status()
 
         return r.json()
