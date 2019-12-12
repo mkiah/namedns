@@ -9,9 +9,10 @@ class Session():
     def __init__(self, username, api_token, dev=False):
         self.username = username if not dev else f"{username}-test"
         self.api_token = api_token
-        
+        self.auth = (self.username, self.api_token)
         base_url = self.BASE_URL if not dev else self.BASE_DEV_URL
         self.base_url = f"{base_url}/v{self.API_VERSION}"
+
 
     def list_domains(self):
         """List all domains for the given account.
@@ -25,6 +26,24 @@ class Session():
         
         return r.json()
 
+    def get_domain(self, domain):
+        """Get details about a specific domain.
+
+        Parameters
+        ----------
+        domain, str
+            domain to get details about.
+        """
+        url = f"{self.base_url}/domains/{domain}"
+        r = requests.get(url, auth=self.auth)
+
+        if not r.ok:
+            print(r.content)
+            r.raise_for_status()
+        
+        return r.json()
+
+
     def list_records(self, domain):
         """List all DNS records for the given domain.
         """
@@ -35,16 +54,16 @@ class Session():
             print(r.content)
             r.raise_for_status()
 
-        return r.json()
+        return r.json()['records']
     
 
-    def get(self, record_id):
+    def get_record(self, record_id):
         """Get details about a specific record by id.
         """
         pass
     
 
-    def create(self, domain, host, record_type, answer, ttl=0, priority=None):
+    def create_record(self, domain, host, record_type, answer, ttl=3600, priority=None):
         """Create a new DNS record.
     
         Parameters
@@ -63,10 +82,25 @@ class Session():
         """
         if answer.lower() in ['MX', 'SRV']:
             raise NotImplementedError
-        pass
-    
+        
+        url = f'{self.base_url}/domains/{domain}/records'
+        payload = {
+            'host': host,
+            'type': record_type,
+            'ttl': ttl,
+            'answer': answer
+        }
+        if priority:
+            data['priority'] = priority
+        
+        r = requests.post(url, auth=self.auth, json=payload)
+        if not r.ok:
+            print(r.content)
+            r.raise_for_status()
 
-    def update(self, record_id, **kwargs):
+        return r.json()
+
+    def update_record(self, record_id, **kwargs):
         """Update an existing DNS record.
     
         Parameters
@@ -87,16 +121,4 @@ class Session():
         
         """
         pass
-
-
-    def __make_headers():
-        """Generate HTTP headers.
-        
-        Returns
-        -------
-        dict,
-            Headers for Name.com http requests
-        """
-        pass
-
 
