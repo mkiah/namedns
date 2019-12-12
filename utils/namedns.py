@@ -17,12 +17,18 @@ class Session():
         """List all domains for the given account.
         """
         url = f"{self.base_url}/domains"
-        r = requests.get(url)
+        r = requests.get(url, auth=(self.username, self.api_token))
+
+        if not r.ok:
+            print(r.content)
+            r.raise_for_status()
+        
+        return r.json()
 
     def list_records(self, domain):
         """List all DNS records for the given domain.
         """
-        url = f"https://{self.base_url}/v{self.API_VERSION}/domains/{domain}/records"
+        url = f"{self.base_url}/domains/{domain}/records"
         r = requests.get(url, auth=(self.username, self.api_token))
 
         if not r.ok:
