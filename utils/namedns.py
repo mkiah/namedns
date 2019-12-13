@@ -122,3 +122,22 @@ class Session():
         """
         pass
 
+    
+    def delete_record(self, domain, record_id):
+        """Delete the given DNS record.
+
+        Parameters
+        ----------
+        domain, str
+            the domain to delete the record from.
+        record_id, int
+            the unique dns record id to delete.
+        """
+        url = f"{self.base_url}/domains/{domain}/records/{record_id}"
+        r = requests.delete(url, auth=self.auth)
+
+        if not r.ok:
+            print(r.content)
+            r.raise_for_status()
+
+        return r.json()
