@@ -16,6 +16,11 @@ class Session():
 
     def list_domains(self):
         """List all domains for the given account.
+
+        Returns
+        -------
+        list,
+            list of domains associated with the account.
         """
         url = f"{self.base_url}/domains"
         r = requests.get(url, auth=(self.username, self.api_token))
@@ -24,7 +29,8 @@ class Session():
             print(r.content)
             r.raise_for_status()
         
-        return r.json()
+        return r.json()['domains']
+
 
     def get_domain(self, domain):
         """Get details about a specific domain.
@@ -33,6 +39,11 @@ class Session():
         ----------
         domain, str
             domain to get details about.
+        
+        Returns
+        -------
+        dict,
+            details about the provided domain.
         """
         url = f"{self.base_url}/domains/{domain}"
         r = requests.get(url, auth=self.auth)
@@ -83,6 +94,9 @@ class Session():
         if answer.lower() in ['MX', 'SRV']:
             raise NotImplementedError
         
+        if ttl < 300:
+            raise ValueError(f'Minimum ttl value is 300.')
+
         url = f'{self.base_url}/domains/{domain}/records'
         payload = {
             'host': host,
