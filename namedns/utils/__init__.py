@@ -1,1 +1,1 @@
-from . import namedns
+from . import auth
