@@ -57,6 +57,9 @@ class Session():
 
     def list_records(self, domain):
         """List all DNS records for the given domain.
+
+        Returns
+        -------
         """
         url = f"{self.base_url}/domains/{domain}/records"
         r = requests.get(url, auth=(self.username, self.api_token))

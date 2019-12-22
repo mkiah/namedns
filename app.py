@@ -2,77 +2,138 @@ import argparse
 import pprint
 import sys
 import getpass
+import textwrap
+import click
 from utils import namedns
 
-class NameDNS():
-    def __init__(self):
-        parser = argparse.ArgumentParser(
-            description="View or edit domains or domain DNS records using the Name.com rest API.",
-            usage='''namedns <command> [<args>]''')
-        parser.add_argument('command', help='Command to run.')
-        args = parser.parse_args(sys.argv[1:2])
+# class NameDNS():
+#     def __init__(self):
+#         parser = argparse.ArgumentParser(
+#             description="View or edit domains or domain DNS records using the Name.com rest API.",
+#             usage='namedns <command> [<args>]',
+#             formatter_class=argparse.RawDescriptionHelpFormatter,
+#             epilog=textwrap.dedent("""\
+#                 commands:
+#                   record
+#                 """))
+#         # parser.add_argument('command', help='Command to run.')
+#         parser.add_argument('--user')
+#         parser.add_argument('--token')
 
-        if not hasattr(self, args.command):
-            print('Unrecognized command')
-            parser.print_help()
-            exit(1)
+#         subparsers = parser.add_subparsers(dest='command')
+#         record_parser = subparsers.add_parser('record')
+        
+#         record_subparser = subparsers.add_subparsers(dest='record_command')
+#         record_add_parser = record_subparser.add_parser('add')
+#         record_add_parser.add_argument('host', type=str,
+#                             help='Hostname relative to the domain (e.g., blog for blog.example.com)')
+#         record_add_parser.add_argument('type', type=str.upper,
+#                             choices=['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT'])
+#         record_add_parser.add_argument('answer', type=str, help="Answer is either the IP address for A or AAAA records; the target   \
+#             for ANAME, CNAME, MX, or NS records the text for TXTrecords. For SRV \
+#             records, answer has the following format: '<weight> <port> <target>' \
+#             (e.g. '1 5061 sip.example.org')")
+#         record_add_parser.add_argument('--ttl', dest='ttl', default=3600, type=int,
+#                             help="TTL is the time this record can be cached for in seconds. Minimum of 300 seconds"
+#                             )
+#         record_add_parser.add_argument('--priority', dest='priority', type=int,
+#                             help="Priority is only required for MX and SRV records, it is ignored for all others.")
 
-        getattr(self, args.command)()
+#         args = parser.parse_args()
 
-    def record(self):
-        """Manage DNS records for a given domain.
-        """
-        parser = argparse.ArgumentParser(
-            description='DNS operations on a given domain.'
-        )
-        parser.add_argument('command', help='DNS command to run')
-        args = parser.parse_args(sys.argv[2:3])
+#         if not hasattr(self, args.command):
+#             print('Unrecognized command')
+#             parser.print_help()
+#             exit(1)
 
-        getattr(self, f'record_{args.command}')()
+#         getattr(self, args.command)()
 
-    def record_add(self):
-        """Add DNS record with the given attributes.
-        """
-        parser = argparse.ArgumentParser(
-            description='Add a DNS record to a given domain'
-        )
-        parser.add_argument('host', type=str,
-            help='Hostname relative to the domain (e.g., blog for blog.example.com)')
-        parser.add_argument('type', type=str.upper,
-            choices=['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT'])
-        parser.add_argument('answer', type=str, help=
-            "Answer is either the IP address for A or AAAA records; the target   \
-            for ANAME, CNAME, MX, or NS records the text for TXTrecords. For SRV \
-            records, answer has the following format: '<weight> <port> <target>' \
-            (e.g. '1 5061 sip.example.org')")
-        parser.add_argument('--ttl', dest='ttl', default=3600, type=int, 
-            help="TTL is the time this record can be cached for in seconds. Minimum of 300 seconds"
-        )
-        parser.add_argument('--priority', dest='priority', type=int,
-            help="Priority is only required for MX and SRV records, it is ignored for all others.")
-        args = parser.parse_args(sys.argv[4:])
-        print(f'Running namedns add-record {args.host} {args.type} {args.answer}')
 
-        add_record(domain=args.domain, host=args.host, record_type=args.type, ttl=args.ttl, answer=args.answer)
+#     # def new_session(self):
+#     #     """Create new name.com API session.
+#     #     """
+#     #     user = None
+#     #     api_token = None
+#     #     dev_server = False if '--dev' not in sys.argv else True
 
-    def record_remove(self):
-        """Remove DNS record.
-        """
-        pass
+#     #     for index, arg in enumerate(sys.argv):
+#     #         if arg == '--user':
+#     #             user = sys.argv.pop(index+1)
+#     #             sys.argv.pop(index)
+#     #         if arg == '--token':
+#     #             api_token = sys.argv.pop(index+1)
+#     #             sys.argv.pop(index)
 
-    def record_list(self):
-        """List DNS records for the given domain.
-        """
-        parser = argparse.ArgumentParser(
-            description="List DNS records for the given domain."
-        )
-        parser.add_argument('--type', dest='type', type=str.upper,
-            choices=['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT'],
-            help='List records with the given record type.')
-        parser.add_argument('--host', dest='host', stype=str,
-            help='List records with the given host value.')
-        pass
+#     #     return namedns.Session(username=user, api_token=api_token, dev=dev_server)
 
+
+#     def record(self):
+#         """Manage DNS records for a given domain.
+#         """
+#         parser = argparse.ArgumentParser(
+#             description='DNS operations on a given domain.',
+#             formatter_class=argparse.RawDescriptionHelpFormatter,
+#             epilog=textwrap.dedent("""\
+#                 commands:
+#                   add
+#                   remove
+#                   list
+#                 """))
+#         parser.add_argument('command', help='DNS command to run')
+#         args = parser.parse_args(sys.argv[2:3])
+
+#         getattr(self, f'record_{args.command}')()
+
+#     def record_add(self):
+#         """Add DNS record with the given attributes.
+#         """
+#         parser = argparse.ArgumentParser(
+#             description='Add a DNS record to a given domain'
+#         )
+#         parser.add_argument('host', type=str,
+#             help='Hostname relative to the domain (e.g., blog for blog.example.com)')
+#         parser.add_argument('type', type=str.upper,
+#             choices=['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT'])
+#         parser.add_argument('answer', type=str, help=
+#             "Answer is either the IP address for A or AAAA records; the target   \
+#             for ANAME, CNAME, MX, or NS records the text for TXTrecords. For SRV \
+#             records, answer has the following format: '<weight> <port> <target>' \
+#             (e.g. '1 5061 sip.example.org')")
+#         parser.add_argument('--ttl', dest='ttl', default=3600, type=int, 
+#             help="TTL is the time this record can be cached for in seconds. Minimum of 300 seconds"
+#         )
+#         parser.add_argument('--priority', dest='priority', type=int,
+#             help="Priority is only required for MX and SRV records, it is ignored for all others.")
+#         args = parser.parse_args(sys.argv[3:])
+#         print(f'Running namedns add-record {args.host} {args.type} {args.answer}')
+
+#         # return self.session.create_record(domain=args.domain, host=args.host, record_type=args.type, ttl=args.ttl, answer=args.answer)
+
+#     def record_remove(self):
+#         """Remove DNS record.
+#         """
+#         raise NotImplementedError
+
+#     def record_list(self):
+#         """List DNS records for the given domain.
+#         """
+#         parser = argparse.ArgumentParser(
+#             description="List DNS records for the given domain."
+#         )
+#         parser.add_argument('--type', dest='type', type=str.upper,
+#             choices=['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT'],
+#             help='List records with the given record type.')
+#         parser.add_argument('--host', dest='host', type=str,
+#             help='List records with the given host value.')
+        
+#         raise NotImplementedError
+
+@click.command()
+@click.option('--ttl', default=3600, help='TTL is the time this record can be cached for in seconds. Minimum of 300 seconds')
+# @click.option('--priority', help="Priority is only required for MX and SRV records, it is ignored for all others.")
+@click.argument('host', help='Hostname relative to the domain (e.g., blog for blog.example.com)')
+@click.argument('record_type', type=click.Choice(['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT']))
+@click.argument('answer')
 def add_record(session, domain, host, record_type, ttl, answer, priority=None):
     return session.create_record(domain=domain, host=host, record_type=record_type, ttl=ttl, answer=answer, priority=priority)
 
@@ -144,5 +205,6 @@ def main():
         pprint.pprint(namedotcom.list_domains())
 
 if __name__ == "__main__":
-    NameDNS()
+    # NameDNS()
     # main()
+    
