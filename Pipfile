@@ -5,11 +5,12 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
-autopep8 = "*"
+namedns = {editable = true,path = "."}
 
 [packages]
 requests = "*"
 click = "*"
+setuptools = "*"
 
 [requires]
 python_version = "3"

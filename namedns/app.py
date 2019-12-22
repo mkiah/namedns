@@ -128,18 +128,6 @@ from utils import namedns
         
 #         raise NotImplementedError
 
-@click.command()
-@click.option('--ttl', default=3600, help='TTL is the time this record can be cached for in seconds. Minimum of 300 seconds')
-# @click.option('--priority', help="Priority is only required for MX and SRV records, it is ignored for all others.")
-@click.argument('host', help='Hostname relative to the domain (e.g., blog for blog.example.com)')
-@click.argument('record_type', type=click.Choice(['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT']))
-@click.argument('answer')
-def add_record(session, domain, host, record_type, ttl, answer, priority=None):
-    return session.create_record(domain=domain, host=host, record_type=record_type, ttl=ttl, answer=answer, priority=priority)
-
-
-def remove_record(session, domain, record_id):
-    return session.delete_record(domain=domain, record_id=record_id)
 
 def main():
     parser = argparse.ArgumentParser(description="Generate or renew letsencrypt \
@@ -204,7 +192,25 @@ def main():
         print(f'No tasks specified. Fetching list of associated domains.')
         pprint.pprint(namedotcom.list_domains())
 
+@click.group()
+def records():
+    pass
+
+@click.command()
+@click.option('--ttl', default=3600, help='TTL is the time this record can be cached for in seconds. Minimum of 300 seconds')
+# @click.option('--priority', help="Priority is only required for MX and SRV records, it is ignored for all others.")
+@click.argument('host', type=str)
+@click.argument('record_type', type=click.Choice(['A', 'AAAA', 'ANAME', 'CNAME', 'MX', 'NS', 'SRV', 'TXT']))
+@click.argument('answer')
+def add_record(record_host, record_type, answer, ttl):
+    # return session.create_record(domain=domain, host=host, record_type=record_type, ttl=ttl, answer=answer, priority=priority)
+    pass
+
+
+def remove_record(session, domain, record_id):
+    return session.delete_record(domain=domain, record_id=record_id)
+
+
 if __name__ == "__main__":
     # NameDNS()
-    # main()
-    
+    click.argument(add_record)

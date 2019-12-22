@@ -1,6 +1,6 @@
 import click
-from commands.record import record
-from commands.domain import domain
+from namedns.commands.record import record
+from namedns.commands.domain import domain
 
 
 @click.group()
