@@ -2,7 +2,7 @@ import click
 from namedns import namedns
 from namedns import utils
 
-@click.group()
+@click.group(help='Manage dns records.')
 def record():
     pass
 

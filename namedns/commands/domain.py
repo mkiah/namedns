@@ -1,6 +1,7 @@
 import click
 
-@click.group()
+
+@click.group(help='Manage domains.')
 def domain():
     pass
 
