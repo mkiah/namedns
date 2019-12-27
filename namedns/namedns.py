@@ -62,7 +62,7 @@ class Session():
         -------
         """
         url = f"{self.base_url}/domains/{domain}/records"
-        r = requests.get(url, auth=(self.username, self.api_token))
+        r = requests.get(url, auth=self.auth)
 
         if not r.ok:
             print(r.content)
@@ -71,10 +71,17 @@ class Session():
         return r.json()['records']
     
 
-    def get_record(self, record_id):
+    def get_record(self, domain, record_id):
         """Get details about a specific record by id.
         """
-        pass
+        url = f"{self.base_url}/domains/{domain}/records/{record_id}"
+        r = requests.get(url, auth=self.auth)
+
+        if not r.ok:
+            print(r.content)
+            r.raise_for_status()
+
+        return r.json()
     
 
     def create_record(self, domain, host, record_type, answer, ttl=3600, priority=None):
